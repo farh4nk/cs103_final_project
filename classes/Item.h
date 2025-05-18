@@ -12,11 +12,16 @@ class Item {
         string itemDesc;
     public:
         Item() {
-            itemName = "";
-            itemDesc = "";
+            itemName = "Unknown item";
+            itemDesc = "No description available.";
         }
 
         Item(string name, string desc);
+        string getName() const;
+        string getDescription() const;
+
+        void setName(string name);
+        void setDescription(string desc);
 
         void interact();
 
