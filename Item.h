@@ -18,6 +18,11 @@ class Item {
 
         Item(string name, string desc);
 
+        
+        string getItemName();
+
+        string getItemDesc();
+        
         void interact();
 
         void use();

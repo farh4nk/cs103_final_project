@@ -1,4 +1,4 @@
-#include "Location.h"
+#include "./Location.h"
 
 Location::Location(string locName, string locDesc, vector<string> dirs, Item locItem) {
     name = locName;
