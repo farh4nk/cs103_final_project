@@ -11,20 +11,25 @@ class Location {
     private:
         string name;
         string description;
-        vector<string> directions;
-        Item currItem;
+        Item* currItem;
 
     public:
+        Location* north;
+        Location* south;
+        Location* east;
+        Location* west;
+
         Location() {
             name = "";
             description = "";
+            currItem = nullptr;
         }
 
-        Location(string locName, string locDesc, vector<string> dirs, Item locItem);
+        Location(string locName, string locDesc, Item* locItem);
         string getName();
         string getDesc();
-        vector<string> getDirections();
-        Item getItem();
+        Item* getItem();
+        void removeItem();
 };
 
 #endif 

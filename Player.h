@@ -8,14 +8,14 @@ using namespace std;
 
 class Player {
     private:
-        vector<Item> inventory;
+        vector<Item*> inventory;
 
     public:
-        void collectItem(Item item);
+        void collectItem(Item* item);
         void printInventory();
-        bool hasItem(string& itemName);
+        bool hasItem(Item* checkItem);
 
-}
+};
 
 
 #endif

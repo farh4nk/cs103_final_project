@@ -8,18 +8,22 @@ using namespace std;
 
 bool gameRunning = true;
 Player player;
+Item* diveKit = new Item("Diving Kit", "Diving Kit that allows you to breathe underwater. Necessary for survival on Miller's Planet.");
+Location* crashSite = new Location("Crash Site", "Your ship malfunctioned and crash landed here. You're gonna have to find a way to fix it.", diveKit);
+// add more locations and items here
 
+
+Location* currLoc = crashSite;
 void run() {
 
-  Item diveKit("Diving Kit", "Diving Kit that allows you to breathe underwater. Necessary for survival on Miller's Planet.");
-  vector<string> directions = {"north"};
-  Location millersPlanet("Miller's Planet", "A distant planet covered in treacherous waters all over its surface. Waves here are deadly.", directions, diveKit);
-
   
-  cout << "You crash landed and ended up on " << millersPlanet.getName() << "." << endl;
-  cout << millersPlanet.getDesc() << endl;
-  cout << "In front of you there is a " << diveKit.getItem().getItemName() << "." << endl;
-  cout << "Interact [E]\tQuit [Q]" << endl;
+  cout << "You're at the " << currLoc->getName() << "." << endl;
+  cout << currLoc->getDesc() << endl;
+  if (currLoc->getItem()) {
+  cout << "In front of you there is a " << currLoc->getItem()->getItemName() << "." << endl;
+  }
+  cout << "Interact [E]\tInventory [I]\tQuit [Q]\tMove [W/A/S/D]" << endl;
+  cout << endl;
   string command;
   cin >> command;
 
@@ -28,7 +32,14 @@ void run() {
   }
 
   else if (command == "E" || command == "e") {
-    player.collectItem(millersPlanet.getItem());
+    if (currLoc->getItem()) {
+    player.collectItem(currLoc->getItem());
+    currLoc->removeItem();
+    
+    }
+    else {
+      cout << "There's nothing to interact with here." << endl;
+    }
   }
    else if (command == "I" || command == "i") {
     player.printInventory();
@@ -38,6 +49,7 @@ void run() {
 }
 
 int main() {
+  cout << "You crash landed and ended up on Miller's planet, a distant planet covered in treacherous waters all over its surface. The waves here are deadly." << endl;
 
 
 
@@ -45,5 +57,6 @@ int main() {
     run();
   }
 
+  delete crashSite;
   return 0;
 }
