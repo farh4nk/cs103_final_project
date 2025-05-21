@@ -23,9 +23,7 @@ class Item {
 
         string getItemDesc();
         
-        void interact();
 
-        void use();
 };
 
 #endif
