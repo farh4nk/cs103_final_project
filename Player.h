@@ -16,8 +16,8 @@ class Player {
             health = 50;
         }
 
-        void collectItem(Item* item);
-        void dropItem();
+        bool collectItem(Item* item);
+        Item* dropItem();
         void printInventory();
         bool hasItem(Item* checkItem);
         int getHealth();

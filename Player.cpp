@@ -4,14 +4,15 @@
 #include "Item.h"
 
 
-void Player::collectItem(Item* item) {
+bool Player::collectItem(Item* item) {
     if (inventory.size() == 4) {
         cout << "Your inventory is full." << endl;
+        return false;
     }
     else {
     inventory.push_back(item);
     cout << item->getItemName() << " added to inventory." << endl;
-    
+    return true;
     }
     cout << endl;
 }
@@ -22,16 +23,17 @@ The following code for the dropItem function was written with the help of ChatGP
 Prompt: how do i remove a specified item from a vector in c++
 Follow up prompt: why doesnt it take int as an argument
 */
-void Player::dropItem() {
+Item* Player::dropItem() {
     int dropIndex;
     cout << "Which number item would you like to drop? NOTE: Items cannot be picked up again after being dropped." << endl;
     cin >> dropIndex;
     if (dropIndex < 0 || dropIndex >= inventory.size()) {
         cout << "Invalid item number. Nothing was dropped." << endl;
-        return;
     }
-    cout << "Dropped: " << inventory.at(dropIndex)->getItemName() << endl;
+    Item* droppedItem = inventory.at(dropIndex);
+    cout << "Dropped: " << droppedItem->getItemName() << endl;
     inventory.erase(inventory.begin() + dropIndex);
+    return droppedItem;
 }
 
 

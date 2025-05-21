@@ -34,7 +34,6 @@ Location* coralForest = nullptr;
 Location* cove = nullptr;
 Location* cavern = nullptr;
 
-Location* tradingPost = nullptr;
 Location* sharkDen = nullptr;
 
 void gameOver()
@@ -80,8 +79,11 @@ void parseCommand()
   {
     if (currLoc->getItem())
     {
-      player.collectItem(currLoc->getItem());
+      bool collected = player.collectItem(currLoc->getItem());
+      // player.collectItem(currLoc->getItem());
+      if (collected) {
       currLoc->removeItem();
+      }
     }
     else
     {
@@ -157,7 +159,11 @@ void parseCommand()
   }
   else if (command == "Z" || command == "z")
   {
-    player.dropItem();
+    Item* dropped = player.dropItem();
+    if (dropped == scraps && currLoc == civilization && currLoc->getItem() == nullptr) {
+      cout << "The locals accept your offering!" << endl;
+      currLoc->setItem(fuelCanister);
+    }
   }
    else if ((command == "C" || command == "c") && (player.hasItem(compass)))
   {
@@ -177,6 +183,11 @@ void parseCommand()
     cout << "You dropped your dive kit and lost it in the depths of the ocean. That was the only thing keeping you alive. Nice going." << endl;
     gameOver();
   }
+  if (currLoc != sharkDen && !(player.hasItem(weapon)))
+  {
+    cout << "Without a means to defend yourself, you were viciously attacked by the mutant alien shark lurking in the depths. You died." << endl;
+    gameOver();
+  }
 }
 
 
@@ -189,7 +200,7 @@ void run()
   {
     cout << "In front of you there is a " << currLoc->getItem()->getItemName() << "." << endl;
   }
-  cout << "Interact [E]\tInventory [I]\tQuit [Q]\tMove [W/A/S/D]\tHealth Bar [H]\tDrop Item [Z]" << endl;
+  cout << "Interact [E]\tInventory [I]\tMove [W/A/S/D]\tHealth Bar [H]\tDrop Item [Z]\tQuit [Q]" << endl;
   if (player.hasItem(compass)) {
     cout << "Check Compass [C]" << endl;
   }
@@ -222,8 +233,9 @@ void createMap()
   ruins = new Location("Abyssal Ruins", "You come to a dark place with ancient ruins.", nullptr);
   trench = new Location("Forgotten Trench", "There's a deep crack in the ocean floor here. Who knows what's down there...", nullptr);
   coralForest = new Location("Coral Forest", "There seems to be glowing alien life here.", glowingClam);
-  civilization = new Location("Underwater Civilization", "You found an underwater civilization! The locals here are all alien fish. Perhaps they will be of some use to you—that is, if you're useful to them...", nullptr);
+  civilization = new Location("Underwater Civilization", "You found an underwater civilization! The locals here are all alien fish, and they were kind enough to offer you supplies, but they want something in return.", nullptr);
   cove = new Location("Moonlit Cove", "There might be something useful here.", weapon);
+  cavern = new Location("Dark Cavern", "You made it to a dark cavern. You hear ominous sounds, and they seem to be coming from up north. Keep your guard up...", nullptr);
   // add more locations and items
 
   // connections between locations
@@ -289,7 +301,6 @@ int main()
 
 /*
 TO DO:
-- inspect item feature
 - implement mini game (fighting)
 - implement ascii art
 - code ending

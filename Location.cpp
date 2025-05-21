@@ -32,3 +32,7 @@ Item* Location::getItem() {
 void Location::removeItem() {
     currItem = nullptr;
 }
+
+void Location::setItem(Item* newItem) {
+    currItem = newItem;
+}

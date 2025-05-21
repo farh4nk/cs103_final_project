@@ -13,11 +13,3 @@ string Item::getItemName() {
 string Item::getItemDesc() {
     return itemDesc;
 }
-
-void Item::interact() {
-    cout << "interact function under construction" << endl;
-}
-
-void Item::use() {
-    cout << "use function under construction" << endl;
-}

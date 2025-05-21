@@ -30,6 +30,7 @@ class Location {
         string getDesc();
         Item* getItem();
         void removeItem();
+        void setItem(Item* newItem);
 };
 
 #endif 
