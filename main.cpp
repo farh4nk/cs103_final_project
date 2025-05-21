@@ -80,7 +80,7 @@ int main() {
   cout << "You crash landed and ended up on Miller's planet, a distant planet covered in treacherous waters all over its surface. The waves here are deadly." << endl;
 
 Item* diveKit = new Item("Diving Kit", "Diving Kit that allows you to breathe underwater. Necessary for survival on Miller's Planet.");
-Location* crashSite = new Location("Crash Site", "Your ship malfunctioned and crash landed here. You're gonna have to find a way to fix it.", diveKit);
+Location* crashSite = new Location("Crash Site", "Your ship malfunctioned and landed here. You're gonna have to find a way to fix it.", diveKit);
 Location* shallows = new Location("Shallows", "Fortunately your ship landed on a shallow spot of water. You wade around looking for something valuable but find nothing.", nullptr);
 // add more locations and items
 
