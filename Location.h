@@ -31,6 +31,7 @@ class Location {
         Item* getItem();
         void removeItem();
         void setItem(Item* newItem);
+        void setDesc(string newDesc);
 };
 
 #endif 

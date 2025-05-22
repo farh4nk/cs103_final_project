@@ -8,15 +8,17 @@ using namespace std;
 
 class Entity {
     private:
-        string type;
+        string name;
+        int health;
+        int dmg;
 
     public:
-        Entity() {
-            type = "";
-        }
-        Entity(string type);
-        void trade();
-        void fight();
+        Entity(string name, int health, int dmg);
+        string getName();
+        int getHealth();
+        void takeDmg(int dmg);
+        int attack();
+        bool isLiving();
 
 };
 

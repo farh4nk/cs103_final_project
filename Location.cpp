@@ -36,3 +36,7 @@ void Location::removeItem() {
 void Location::setItem(Item* newItem) {
     currItem = newItem;
 }
+
+void Location::setDesc(string newDesc) {
+    description = newDesc;
+}

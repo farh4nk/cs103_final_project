@@ -4,7 +4,12 @@
 #include "Location.h"
 #include "Item.h"
 #include "Player.h"
+#include "Entity.h"
 using namespace std;
+
+void fight();
+void win();
+
 
 bool gameRunning = true;
 Player player;
@@ -17,6 +22,7 @@ Item* heavyMetal = nullptr;
 Item* compass = nullptr;
 Item* weapon = nullptr;
 Item* glowingClam = nullptr;
+Item* tape = nullptr;
 
 Location *crashSite = nullptr;
 Location *shallows = nullptr;
@@ -35,6 +41,25 @@ Location* cove = nullptr;
 Location* cavern = nullptr;
 
 Location* sharkDen = nullptr;
+Location* crevice = nullptr;
+
+bool inCombat = false;
+Entity* enemy = nullptr;
+
+Entity* protag = nullptr;
+
+bool sharkDead = false;
+
+
+void printShark() {
+  cout << "                 /\"*._         _\n";
+  cout << "            .-*'`    `*-.._.-'/\n";
+  cout << "          < * ))     ,       ( \n";
+  cout << "            `*-._`._(__.--*\"`.\\ \n";
+  cout << "                  `))  \n";
+  cout << endl;
+
+}
 
 void gameOver()
 {
@@ -58,6 +83,8 @@ void showDirections() {
   }
 }
 
+
+
 void parseCommand()
 {
   string command;
@@ -70,7 +97,7 @@ void parseCommand()
     gameOver();
   }
 
-  if (command == "H" || command == "h")
+  else if (command == "H" || command == "h")
   {
     cout << "Current Health: " << player.getHealth() << "/50" << endl;
   }
@@ -105,11 +132,15 @@ void parseCommand()
       if (currLoc->north)
       {
         currLoc = currLoc->north;
+        if (currLoc == sharkDen && !inCombat && player.hasItem(weapon) && !sharkDead) {
+            fight();
+        }
       }
       else
       {
         cout << "You can't go north from here." << endl;
       }
+      
     }
   }
   else if (command == "A" || command == "a")
@@ -146,28 +177,53 @@ void parseCommand()
     }
   }
 
-  else if (command == "D" || command == "d")
-  {
-    if (currLoc->east)
-    {
-      currLoc = currLoc->east;
-    }
-    else
-    {
-      cout << "You can't go west from here." << endl;
-    }
-  }
   else if (command == "Z" || command == "z")
   {
     Item* dropped = player.dropItem();
+
+    // when trade occurs
     if (dropped == scraps && currLoc == civilization && currLoc->getItem() == nullptr) {
       cout << "The locals accept your offering!" << endl;
       currLoc->setItem(fuelCanister);
+      civilization->setDesc("The locals are happy to do business with you!");
     }
   }
    else if ((command == "C" || command == "c") && (player.hasItem(compass)))
   {
     showDirections();
+  }
+
+  else if ((command == "V" || command == "v") && inCombat)
+  {
+    int stab = protag->attack();
+    enemy->takeDmg(stab);
+    cout << "You hit the shark for " << stab << "damage." << endl;
+  cout << "Shark HP: " << enemy->getHealth() << endl;
+
+
+  // upon defeating shark
+  if (!enemy->isLiving()) {
+    cout << "With your weapon and your survival skills, you managed to survive the encounter with the vicious alien shark." << endl;
+    inCombat = false;
+    player.setHealth(protag->getHealth());
+    sharkDen->setDesc("Here lies the alien shark that was standing in your way. He seemed to be guarding something valuable.");
+    sharkDead = true;
+    return;
+  }
+
+  int bite = enemy->attack();
+  protag->takeDmg(bite);
+  cout << "The shark bit you for " << bite << "damage." << endl;
+  player.setHealth(player.getHealth() - bite);
+
+
+  // if player dies
+  if (!protag->isLiving()) {
+    cout << "The shark got the upper hand and killed you." << endl;
+    gameOver();
+    return;
+  }
+    
   }
 
 
@@ -183,13 +239,34 @@ void parseCommand()
     cout << "You dropped your dive kit and lost it in the depths of the ocean. That was the only thing keeping you alive. Nice going." << endl;
     gameOver();
   }
-  if (currLoc != sharkDen && !(player.hasItem(weapon)))
+  if (currLoc == sharkDen && !(player.hasItem(weapon)) && !sharkDead)
   {
-    cout << "Without a means to defend yourself, you were viciously attacked by the mutant alien shark lurking in the depths. You died." << endl;
+    cout << "Without a means to defend yourself, you were brutally attacked by the mutant alien shark lurking in the depths. You died." << endl;
     gameOver();
   }
+
+  
 }
 
+
+void fight() {
+printShark();
+cout << "Defend yourself!" << endl;
+enemy = new Entity("Alien Shark", 30, 8);
+protag = new Entity("You", player.getHealth(), 7);
+
+inCombat = true;
+
+cout << "Press [V] to attack!" << endl;
+
+while (inCombat && gameRunning) {
+  parseCommand();
+}
+
+delete enemy;
+delete protag;
+
+}
 
 void run()
 {
@@ -206,7 +283,21 @@ void run()
   }
   cout << endl;
   parseCommand();
+  bool hasAllItems = player.hasItem(fuelCanister) && player.hasItem(compass) && player.hasItem(tape);
+
+if (hasAllItems && currLoc != crashSite) {
+    cout << "You found all the required items! Get back to the ship!" << endl;
+}
+else if (hasAllItems && currLoc == crashSite) {
+    win();
+}
+
   cout << endl;
+
+
+  
+
+
 }
 
 void createMap()
@@ -219,6 +310,7 @@ void createMap()
   heavyMetal = new Item("Heavy Metal Scrap", "This hefty piece of scrap weighs you down when you carry it. Maybe thats a good thing?");
   glowingClam = new Item("Glowing Clam", "Looks cool.");
   weapon = new Item("Sword", "Crucial in case of self-defense.");
+  tape = new Item("Flex Tape", "For some reason, this planet also has flex tape. This will come in handy.");
 
 
   // create locations
@@ -236,6 +328,8 @@ void createMap()
   civilization = new Location("Underwater Civilization", "You found an underwater civilization! The locals here are all alien fish, and they were kind enough to offer you supplies, but they want something in return.", nullptr);
   cove = new Location("Moonlit Cove", "There might be something useful here.", weapon);
   cavern = new Location("Dark Cavern", "You made it to a dark cavern. You hear ominous sounds, and they seem to be coming from up north. Keep your guard up...", nullptr);
+  sharkDen = new Location("Alien Shark Den", "There's a hungry alien shark here! You're gonna have to fight for your life.", nullptr);
+  crevice = new Location("Crevice", "The shark was guarding this crevice. Surely there's something valuable here...", tape);
   // add more locations and items
 
   // connections between locations
@@ -261,6 +355,12 @@ void createMap()
   coralForest->east = cove;
   coralForest->west = civilization;
   cove->west = coralForest;
+  cove->east = cavern;
+  cavern->west = cove;
+  cavern->north = sharkDen;
+  sharkDen->south = cavern;
+  sharkDen->west = crevice;
+  crevice->east = sharkDen;
   ruins->west = trench;
   trench->east = ruins;
 trench->north = civilization;
@@ -268,6 +368,29 @@ civilization->south = trench;
 civilization->east = coralForest;
 
 
+
+}
+
+void printWin() {
+cout << "  __   __           __        ___       _ \n"; 
+cout << "  \ \ / /__  _   _  \ \      / (_)_ __ | |\n";
+cout << "   \ V / _ \| | | |  \ \ /\ / /| | '_ \| |\n";
+cout << "    | | (_) | |_| |   \ V  V / | | | | |_|\n";
+cout << "    |_|\___/ \__,_|    \_/\_/  |_|_| |_(_)\n";
+}
+
+void win() {
+  cout << "You made it back to your ship with all the necessary parts, and you're in one piece!" << endl;
+  cout << "You replace your broken navigation systems with the compass. You refuel your ship with the fuel canister so that it can get running again. And that flex tape did a great job of fixing up any breaks—it works just as advertised!" << endl;
+  cout << "YOU MADE IT HOME!" << endl;
+  printWin();
+
+  if (player.getHealth() <= 10) {
+    cout << "Achievement Unlocked: Last Legs" << endl;
+    cout << "Make it back home with 10 health or less." << endl;
+  }
+
+  gameOver();
 }
 
 int main()
@@ -293,7 +416,7 @@ int main()
   delete undertow;
   delete reef;
   delete wreckage;
-
+  delete tape;
   return 0;
 }
 
